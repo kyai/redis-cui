@@ -4,11 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"redis-cui/app"
 	"redis-cui/cui"
 	"redis-cui/redis"
 )
-
-const VERSION = "0.0.1"
 
 var (
 	host string
@@ -29,11 +28,15 @@ func main() {
 			flag.Usage()
 			os.Exit(0)
 		case "--version":
-			fmt.Println(VERSION)
+			fmt.Println(app.VERSION)
 			os.Exit(0)
 		}
 	}
 
-	redis.NewPool(host, auth, 10, 10, 10)
+	if err := redis.NewPool(host, auth, 10, 10, 10); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+
 	cui.New()
 }
