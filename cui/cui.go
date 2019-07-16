@@ -16,20 +16,36 @@ const (
 	ViewStatus = "status"
 )
 
+var g *gocui.Gui
+
 func New() {
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	var err error
+	g, err = gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
 	}
 	defer g.Close()
 
+	g.Highlight = true
+	g.Cursor = true
+	g.SelFgColor = gocui.ColorGreen
+
 	g.SetManagerFunc(layout)
 
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
+	if err = g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
+		log.Panicln(err)
+	}
+	if err = g.SetKeybinding(ViewData, gocui.KeyArrowLeft, gocui.ModNone, switchKeys); err != nil {
+		log.Panicln(err)
+	}
+	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowRight, gocui.ModNone, switchData); err != nil {
+		log.Panicln(err)
+	}
+	if err = g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, switchCond); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+	if err = g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
 }
@@ -52,6 +68,10 @@ func layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Title = "Keys"
+
+		if _, err = setCurrentViewOnTop(g, ViewKeys); err != nil {
+			return err
+		}
 	}
 
 	if v, err := g.SetView(ViewOption, leftX+1, 0, x-1, 3); err != nil {
@@ -73,7 +93,8 @@ func layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Frame = false
-		fmt.Fprintln(v, "status bar")
+		v.Editable = true
+		fmt.Fprintln(v, "*")
 	}
 
 	if v, err := g.SetView(ViewStatus, leftX+1, y-2, x, y); err != nil {
@@ -89,4 +110,11 @@ func layout(g *gocui.Gui) error {
 
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
+}
+
+func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
+	if _, err := g.SetCurrentView(name); err != nil {
+		return nil, err
+	}
+	return g.SetViewOnTop(name)
 }
