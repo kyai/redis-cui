@@ -1,16 +1,16 @@
 package cui
 
 import (
+	"fmt"
 	"redis-cui/redis"
-	"strings"
 )
 
 func renderKeys() (err error) {
-	v, err := g.View(ViewCond)
+	view, err := g.View(ViewCond)
 	if err != nil {
 		return
 	}
-	cond := v.ViewBuffer()
+	cond := view.ViewBufferLines()[0]
 
 	conn := redis.Pool.Get()
 	defer conn.Close()
@@ -19,7 +19,17 @@ func renderKeys() (err error) {
 	if err != nil {
 		return
 	}
-	renderTest(strings.Join(keys, "|"))
+
+	view, err = g.View(ViewKeys)
+	if err != nil {
+		return
+	}
+
+	view.Clear()
+	for _, v := range keys {
+		fmt.Fprintln(view, v)
+	}
+
 	return
 }
 

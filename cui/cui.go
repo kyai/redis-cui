@@ -3,6 +3,7 @@ package cui
 import (
 	"fmt"
 	"log"
+	"redis-cui/app"
 
 	"github.com/jroimartin/gocui"
 )
@@ -31,6 +32,10 @@ func New() {
 	g.SelFgColor = gocui.ColorGreen
 
 	g.SetManagerFunc(layout)
+
+	g.Update(func(*gocui.Gui) error {
+		return renderKeys()
+	})
 
 	if err = g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
@@ -105,6 +110,14 @@ func layout(g *gocui.Gui) error {
 		fmt.Fprintln(v, "status bar")
 	}
 
+	if v, err := g.SetView("version", x-10, y-2, x, y); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Frame = false
+		fmt.Fprintln(v, fillAtLeft(app.VERSION, 9))
+	}
+
 	return nil
 }
 
@@ -117,4 +130,12 @@ func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
 		return nil, err
 	}
 	return g.SetViewOnTop(name)
+}
+
+func fillAtLeft(s string, l int) string {
+	n := l - len(s)
+	for i := 0; i < n; i++ {
+		s = " " + s
+	}
+	return s
 }
