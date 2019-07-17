@@ -37,16 +37,7 @@ func New() {
 		return renderKeys()
 	})
 
-	if err = g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		log.Panicln(err)
-	}
-	if err = g.SetKeybinding(ViewData, gocui.KeyArrowLeft, gocui.ModNone, switchKeys); err != nil {
-		log.Panicln(err)
-	}
-	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowRight, gocui.ModNone, switchData); err != nil {
-		log.Panicln(err)
-	}
-	if err = g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, switchCond); err != nil {
+	if err = keybind(); err != nil {
 		log.Panicln(err)
 	}
 
