@@ -60,15 +60,15 @@ func layout(g *gocui.Gui) error {
 
 	leftX := 24
 
-	if v, err := g.SetView(ViewInfo, 0, 0, leftX, 3); err != nil {
+	if v, err := g.SetView(ViewInfo, 0, 0, leftX, 2); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Title = "Info"
-		v.Write([]byte("123.123.123.123:6789"))
+		v.Write([]byte(fmt.Sprintf("%s (db%d)", app.RedisHost, app.RedisDB)))
 	}
 
-	if v, err := g.SetView(ViewKeys, 0, 4, leftX, y-2); err != nil {
+	if v, err := g.SetView(ViewKeys, 0, 3, leftX, y-2); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -79,14 +79,14 @@ func layout(g *gocui.Gui) error {
 		}
 	}
 
-	if v, err := g.SetView(ViewOption, leftX+1, 0, x-1, 3); err != nil {
+	if v, err := g.SetView(ViewOption, leftX+1, 0, x-1, 2); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Title = "Option"
 	}
 
-	if v, err := g.SetView(ViewData, leftX+1, 4, x-1, y-2); err != nil {
+	if v, err := g.SetView(ViewData, leftX+1, 3, x-1, y-2); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}

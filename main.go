@@ -9,14 +9,9 @@ import (
 	"redis-cui/redis"
 )
 
-var (
-	host string
-	auth string
-)
-
 func init() {
-	flag.StringVar(&host, "h", "127.0.0.1:6379", "redis's host")
-	flag.StringVar(&auth, "p", "", "redis's auth")
+	flag.StringVar(&app.RedisHost, "h", "127.0.0.1:6379", "redis's host")
+	flag.StringVar(&app.RedisAuth, "p", "", "redis's auth")
 	flag.Parse()
 }
 
@@ -33,7 +28,7 @@ func main() {
 		}
 	}
 
-	if err := redis.NewPool(host, auth, 10, 10, 10); err != nil {
+	if err := redis.NewPool(app.RedisHost, app.RedisAuth, 10, 10, 10); err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}

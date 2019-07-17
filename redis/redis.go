@@ -38,5 +38,6 @@ func NewPool(server, password string, maxIdle, maxActive, idleTimeout int) error
 			return err
 		},
 	}
-	return nil
+	_, err := String(Pool.Get().Do("PING"))
+	return err
 }
