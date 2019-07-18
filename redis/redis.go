@@ -7,9 +7,11 @@ import (
 )
 
 var (
-	Pool    *redis.Pool
-	String  = redis.String
-	Strings = redis.Strings
+	Pool      *redis.Pool
+	String    = redis.String
+	Strings   = redis.Strings
+	Int       = redis.Int
+	StringMap = redis.StringMap
 )
 
 func NewPool(server, password string, maxIdle, maxActive, idleTimeout int) error {

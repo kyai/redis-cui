@@ -60,5 +60,5 @@ func handleKeysSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 	} else {
 		v.MoveCursor(0, 1, false)
 	}
-	return nil
+	return renderData()
 }
