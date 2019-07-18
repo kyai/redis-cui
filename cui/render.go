@@ -58,6 +58,7 @@ func renderKeys() (err error) {
 			fmt.Fprintln(view)
 		}
 	}
+	view.SetOrigin(0, 0)
 	view.SetCursor(0, 0)
 
 	return renderData()
@@ -67,7 +68,6 @@ func renderData() (err error) {
 	vKeys, _ := g.View(ViewKeys)
 	_, cy := vKeys.Cursor()
 	key, _ := vKeys.Line(cy)
-	renderTest(key)
 
 	vOption, _ := g.View(ViewOption)
 	vData, _ := g.View(ViewData)
@@ -113,6 +113,11 @@ func renderData() (err error) {
 func getRedisEntry(key string) (entry *Entry, err error) {
 	conn := redis.Pool.Get()
 	defer conn.Close()
+
+	exist, err := redis.Bool(conn.Do("EXISTS", key))
+	if err != nil || !exist {
+		return
+	}
 
 	entry = &Entry{}
 	entry.Key = key

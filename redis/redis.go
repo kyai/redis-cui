@@ -11,6 +11,7 @@ var (
 	String    = redis.String
 	Strings   = redis.Strings
 	Int       = redis.Int
+	Bool      = redis.Bool
 	StringMap = redis.StringMap
 )
 
