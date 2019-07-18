@@ -73,11 +73,19 @@ func renderData() (err error) {
 
 	entry, _ := getRedisEntry(key)
 
+	textLeft := fmt.Sprintf("%s %s", color.New(color.FgBlue).Sprint(entry.Type), key)
+	textRight := ""
+	if entry.Type != "STRING" {
+		textRight = fmt.Sprintf("Size:%v ", entry.Size)
+	}
+	textRight += fmt.Sprintf("TTL:%v", entry.TTL)
+
+	textWidth, _ := vOption.Size()
+	textBlank := textWidth - StringLen(textLeft) - StringLen(textRight)
+	textSpace := strings.Join(make([]string, textBlank+1), " ")
+
 	vOption.Clear()
-	fmt.Fprintf(vOption, "%s %s",
-		color.New(color.FgBlue).Sprint(entry.Type),
-		key,
-	)
+	fmt.Fprintf(vOption, "%s%s%s", textLeft, textSpace, textRight)
 
 	vData.Clear()
 	switch entry.Type {

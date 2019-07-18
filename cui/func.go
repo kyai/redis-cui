@@ -1,6 +1,9 @@
 package cui
 
-import "sort"
+import (
+	"regexp"
+	"sort"
+)
 
 func MapKeys(m map[string]string) (keys []string) {
 	for k, _ := range m {
@@ -8,4 +11,12 @@ func MapKeys(m map[string]string) (keys []string) {
 	}
 	sort.Strings(keys)
 	return
+}
+
+func StringRaw(s string) string {
+	return regexp.MustCompile(`\x1b\[\d+m|\x1b\[0m`).ReplaceAllString(s, "")
+}
+
+func StringLen(s string) int {
+	return len(StringRaw(s))
 }
