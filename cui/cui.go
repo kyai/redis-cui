@@ -75,7 +75,7 @@ func layout(g *gocui.Gui) error {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
-		v.Title = "Option"
+		v.Title = "Detail"
 	}
 
 	if v, err := g.SetView(ViewData, leftX+1, 3, x-1, y-2); err != nil {

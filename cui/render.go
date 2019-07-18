@@ -58,6 +58,7 @@ func renderKeys() (err error) {
 			fmt.Fprintln(view)
 		}
 	}
+	view.SetCursor(0, 0)
 
 	return renderData()
 }
@@ -79,6 +80,7 @@ func renderData() (err error) {
 		textRight = fmt.Sprintf("Size:%v ", entry.Size)
 	}
 	textRight += fmt.Sprintf("TTL:%v", entry.TTL)
+	textRight = color.New(color.FgBlue).Sprint(textRight)
 
 	textWidth, _ := vOption.Size()
 	textBlank := textWidth - StringLen(textLeft) - StringLen(textRight)
@@ -123,6 +125,7 @@ func getRedisEntry(key string) (entry *Entry, err error) {
 		entry.Data, _ = redis.String(conn.Do("GET", key))
 	case "LIST":
 		entry.Data, _ = redis.Strings(conn.Do("LRANGE", key, 0, -1))
+		entry.Size = len(entry.Data.([]string))
 	case "HASH":
 		data, _ := redis.StringMap(conn.Do("HGETALL", key))
 		keys := MapKeys(data)
@@ -131,8 +134,10 @@ func getRedisEntry(key string) (entry *Entry, err error) {
 			hashs[k] = &Hash{v, data[v]}
 		}
 		entry.Data = hashs
+		entry.Size = len(hashs)
 	case "SET":
 		entry.Data, _ = redis.Strings(conn.Do("SMEMBERS", key))
+		entry.Size = len(entry.Data.([]string))
 	case "ZSET":
 		data, _ := redis.Strings(conn.Do("ZRANGE", key, 0, -1, "WITHSCORES"))
 		zsets := make([]*Zset, len(data)/2)
@@ -141,6 +146,7 @@ func getRedisEntry(key string) (entry *Entry, err error) {
 			zsets[i/2] = &Zset{data[i], int64(score)}
 		}
 		entry.Data = zsets
+		entry.Size = len(zsets)
 	}
 
 	return
