@@ -3,6 +3,7 @@ package cui
 import (
 	"fmt"
 	"redis-cui/redis"
+	"sort"
 )
 
 func renderKeys() (err error) {
@@ -26,8 +27,12 @@ func renderKeys() (err error) {
 	}
 
 	view.Clear()
-	for _, v := range keys {
-		fmt.Fprintln(view, v)
+	sort.Strings(keys)
+	for k, v := range keys {
+		fmt.Fprint(view, v)
+		if k < len(keys)-1 {
+			fmt.Fprintln(view)
+		}
 	}
 
 	return

@@ -17,10 +17,10 @@ func keybind() (err error) {
 	if err = g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, switchCond); err != nil {
 		return
 	}
-	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowUp, gocui.ModNone, toggleKey); err != nil {
+	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowUp, gocui.ModNone, handleKeysPrevLine); err != nil {
 		return
 	}
-	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowDown, gocui.ModNone, toggleKey); err != nil {
+	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine); err != nil {
 		return
 	}
 	return
@@ -46,6 +46,19 @@ func switchCond(g *gocui.Gui, v *gocui.View) error {
 	return err
 }
 
-func toggleKey(g *gocui.Gui, v *gocui.View) error {
+func handleKeysNextLine(g *gocui.Gui, v *gocui.View) error {
+	return handleKeysSelect(g, v, false)
+}
+
+func handleKeysPrevLine(g *gocui.Gui, v *gocui.View) error {
+	return handleKeysSelect(g, v, true)
+}
+
+func handleKeysSelect(g *gocui.Gui, v *gocui.View, up bool) error {
+	if up {
+		v.MoveCursor(0, -1, false)
+	} else {
+		v.MoveCursor(0, 1, false)
+	}
 	return nil
 }

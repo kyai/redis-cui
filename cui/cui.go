@@ -49,7 +49,7 @@ func New() {
 func layout(g *gocui.Gui) error {
 	x, y := g.Size()
 
-	leftX := 24
+	leftX := 32
 
 	if v, err := g.SetView(ViewInfo, 0, 0, leftX, 2); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -64,6 +64,7 @@ func layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Title = "Keys"
+		v.Highlight = true
 
 		if _, err = setCurrentViewOnTop(g, ViewKeys); err != nil {
 			return err
