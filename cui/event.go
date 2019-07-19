@@ -4,24 +4,25 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+var keyboard = []struct {
+	viewname string
+	key      interface{}
+	mod      gocui.Modifier
+	handler  func(*gocui.Gui, *gocui.View) error
+}{
+	{"", gocui.KeyCtrlC, gocui.ModNone, quit},
+	{ViewData, gocui.KeyArrowLeft, gocui.ModNone, switchKeys},
+	{ViewKeys, gocui.KeyArrowRight, gocui.ModNone, switchData},
+	{"", gocui.KeyEnter, gocui.ModNone, switchCond},
+	{ViewKeys, gocui.KeyArrowUp, gocui.ModNone, handleKeysPrevLine},
+	{ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine},
+}
+
 func keybind() (err error) {
-	if err = g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		return
-	}
-	if err = g.SetKeybinding(ViewData, gocui.KeyArrowLeft, gocui.ModNone, switchKeys); err != nil {
-		return
-	}
-	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowRight, gocui.ModNone, switchData); err != nil {
-		return
-	}
-	if err = g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, switchCond); err != nil {
-		return
-	}
-	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowUp, gocui.ModNone, handleKeysPrevLine); err != nil {
-		return
-	}
-	if err = g.SetKeybinding(ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine); err != nil {
-		return
+	for _, v := range keyboard {
+		if err = g.SetKeybinding(v.viewname, v.key, v.mod, v.handler); err != nil {
+			return
+		}
 	}
 	return
 }

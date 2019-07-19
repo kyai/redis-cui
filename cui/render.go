@@ -73,6 +73,9 @@ func renderData() (err error) {
 	vData, _ := g.View(ViewData)
 
 	entry, _ := getRedisEntry(key)
+	if entry == nil {
+		return
+	}
 
 	textLeft := fmt.Sprintf("%s %s", color.New(color.FgBlue).Sprint(entry.Type), key)
 	textRight := ""
