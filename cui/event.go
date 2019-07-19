@@ -18,6 +18,28 @@ var keyboard = []struct {
 	{ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine},
 }
 
+func init() {
+	// Support vim key
+	for i, l := 0, len(keyboard); i < l; i++ {
+		v := keyboard[i]
+		if key, ok := v.key.(gocui.Key); ok {
+			switch key {
+			case gocui.KeyArrowUp:
+				v.key = 'k'
+			case gocui.KeyArrowDown:
+				v.key = 'j'
+			case gocui.KeyArrowLeft:
+				v.key = 'h'
+			case gocui.KeyArrowRight:
+				v.key = 'l'
+			default:
+				break
+			}
+			keyboard = append(keyboard, v)
+		}
+	}
+}
+
 func keybind() (err error) {
 	for _, v := range keyboard {
 		if err = g.SetKeybinding(v.viewname, v.key, v.mod, v.handler); err != nil {
