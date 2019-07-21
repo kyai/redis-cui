@@ -2,6 +2,7 @@ package cui
 
 import (
 	"fmt"
+	"redis-cui/class"
 	"redis-cui/redis"
 	"sort"
 	"strconv"
@@ -26,7 +27,7 @@ type (
 
 	Zset struct {
 		Value string
-		Score int64
+		Score int
 	}
 )
 
@@ -92,23 +93,26 @@ func renderData() (err error) {
 	vOption.Clear()
 	fmt.Fprintf(vOption, "%s%s%s", textLeft, textSpace, textRight)
 
-	vData.Clear()
+	e := class.NewClass(entry.Type, g)
+
 	switch entry.Type {
 	case "STRING":
-		fmt.Fprint(vData, entry.Data.(string))
+		e.AddRow(entry.Data.(string))
 	case "LIST", "SET":
-		for _, v := range entry.Data.([]string) {
-			fmt.Fprintln(vData, v)
+		for k, v := range entry.Data.([]string) {
+			e.AddRow(strconv.Itoa(k+1), v)
 		}
 	case "HASH":
-		for _, v := range entry.Data.([]*Hash) {
-			fmt.Fprintf(vData, "%s\t%s\n", v.Key, v.Value)
+		for k, v := range entry.Data.([]*Hash) {
+			e.AddRow(strconv.Itoa(k+1), v.Key, v.Value)
 		}
 	case "ZSET":
-		for _, v := range entry.Data.([]*Zset) {
-			fmt.Fprintf(vData, "%s\t%v\n", v.Value, v.Score)
+		for k, v := range entry.Data.([]*Zset) {
+			e.AddRow(strconv.Itoa(k+1), v.Value, strconv.Itoa(v.Score))
 		}
 	}
+
+	e.Render(vData)
 
 	return
 }
@@ -151,7 +155,7 @@ func getRedisEntry(key string) (entry *Entry, err error) {
 		zsets := make([]*Zset, len(data)/2)
 		for i := 0; i < len(data); i += 2 {
 			score, _ := strconv.Atoi(data[i+1])
-			zsets[i/2] = &Zset{data[i], int64(score)}
+			zsets[i/2] = &Zset{data[i], score}
 		}
 		entry.Data = zsets
 		entry.Size = len(zsets)

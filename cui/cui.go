@@ -9,13 +9,12 @@ import (
 )
 
 const (
-	ViewInfo     = "info"
-	ViewKeys     = "keys"
-	ViewCond     = "cond"
-	ViewOption   = "option"
-	ViewStatus   = "status"
-	ViewData     = "data"
-	ViewDataHead = "data-head"
+	ViewInfo   = "info"
+	ViewKeys   = "keys"
+	ViewData   = "data"
+	ViewCond   = "cond"
+	ViewOption = "option"
+	ViewStatus = "status"
 )
 
 var g *gocui.Gui
@@ -79,26 +78,11 @@ func layout(g *gocui.Gui) error {
 		v.Title = "Detail"
 	}
 
-	if v, err := g.SetView("data-wrap", leftX+1, 3, x-1, y-2); err != nil {
+	if v, err := g.SetView(ViewData, leftX+1, 3, x-1, y-2); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Title = "Data"
-	}
-
-	if v, err := g.SetView(ViewDataHead, leftX+1, 3, x-1, 5); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Frame = false
-		v.FgColor = gocui.AttrUnderline
-	}
-
-	if v, err := g.SetView(ViewData, leftX+1, 4, x-1, y-2); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Frame = false
 	}
 
 	if v, err := g.SetView(ViewCond, 0, y-2, leftX, y); err != nil {
