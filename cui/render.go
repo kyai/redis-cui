@@ -93,6 +93,9 @@ func renderData() (err error) {
 	vOption.Clear()
 	fmt.Fprintf(vOption, "%s%s%s", textLeft, textSpace, textRight)
 
+	vData.SetOrigin(0, 0)
+	vData.SetCursor(0, 0)
+
 	e := class.NewClass(entry.Type, g)
 
 	switch entry.Type {

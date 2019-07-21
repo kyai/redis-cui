@@ -16,6 +16,8 @@ var keyboard = []struct {
 	{"", gocui.KeyEnter, gocui.ModNone, switchCond},
 	{ViewKeys, gocui.KeyArrowUp, gocui.ModNone, handleKeysPrevLine},
 	{ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine},
+	{ViewData, gocui.KeyArrowUp, gocui.ModNone, handleDataPrevLine},
+	{ViewData, gocui.KeyArrowDown, gocui.ModNone, handleDataNextLine},
 }
 
 func init() {
@@ -84,4 +86,21 @@ func handleKeysSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 		v.MoveCursor(0, 1, false)
 	}
 	return renderData()
+}
+
+func handleDataNextLine(g *gocui.Gui, v *gocui.View) error {
+	return handleDataSelect(g, v, false)
+}
+
+func handleDataPrevLine(g *gocui.Gui, v *gocui.View) error {
+	return handleDataSelect(g, v, true)
+}
+
+func handleDataSelect(g *gocui.Gui, v *gocui.View, up bool) error {
+	if up {
+		v.MoveCursor(0, -1, false)
+	} else {
+		v.MoveCursor(0, 1, false)
+	}
+	return nil
 }
