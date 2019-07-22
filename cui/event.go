@@ -47,6 +47,7 @@ func keybind() (err error) {
 		if err = g.SetKeybinding(v.viewname, v.key, v.mod, v.handler); err != nil {
 			return
 		}
+		g.SetKeybinding(v.viewname, v.key, v.mod, handleStatusBar)
 	}
 	return
 }
@@ -103,4 +104,8 @@ func handleDataSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 		v.MoveCursor(0, 1, false)
 	}
 	return nil
+}
+
+func handleStatusBar(g *gocui.Gui, v *gocui.View) error {
+	return renderStatusBar()
 }

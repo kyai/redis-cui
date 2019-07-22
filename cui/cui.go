@@ -34,6 +34,9 @@ func New() {
 	g.SetManagerFunc(layout)
 
 	g.Update(func(*gocui.Gui) error {
+		if err := renderStatusBar(); err != nil {
+			return err
+		}
 		return renderKeys()
 	})
 
@@ -99,7 +102,7 @@ func layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Frame = false
-		fmt.Fprintln(v, "status bar")
+		v.FgColor = gocui.ColorBlue
 	}
 
 	if v, err := g.SetView("version", x-10, y-2, x, y); err != nil {
@@ -107,6 +110,7 @@ func layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Frame = false
+		v.FgColor = gocui.ColorCyan
 		fmt.Fprintln(v, fillAtLeft(app.VERSION, 9))
 	}
 

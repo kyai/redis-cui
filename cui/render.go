@@ -78,13 +78,13 @@ func renderData() (err error) {
 		return
 	}
 
-	textLeft := fmt.Sprintf("%s %s", color.New(color.FgBlue).Sprint(entry.Type), key)
+	textLeft := fmt.Sprintf("%s %s", color.New(color.FgMagenta).Sprint(entry.Type), key)
 	textRight := ""
 	if entry.Type != "STRING" {
 		textRight = fmt.Sprintf("Size:%v ", entry.Size)
 	}
 	textRight += fmt.Sprintf("TTL:%v", entry.TTL)
-	textRight = color.New(color.FgBlue).Sprint(textRight)
+	textRight = color.New(color.FgMagenta).Sprint(textRight)
 
 	textWidth, _ := vOption.Size()
 	textBlank := textWidth - StringLen(textLeft) - StringLen(textRight)
@@ -171,4 +171,18 @@ func renderTest(s string) {
 	v, _ := g.View(ViewData)
 	v.Clear()
 	v.Write([]byte(s))
+}
+
+func renderStatusBar() error {
+	var text string
+	switch g.CurrentView().Name() {
+	case ViewKeys:
+		text = "m: menu, r: reload, d: delete"
+	case ViewData:
+		text = "m: menu, c: complete"
+	}
+	view, _ := g.View(ViewStatus)
+	view.Clear()
+	view.Write([]byte(text))
+	return nil
 }
