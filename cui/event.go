@@ -18,6 +18,9 @@ var keyboard = []struct {
 	{ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine},
 	{ViewData, gocui.KeyArrowUp, gocui.ModNone, handleDataPrevLine},
 	{ViewData, gocui.KeyArrowDown, gocui.ModNone, handleDataNextLine},
+	{ViewKeys, 'm', gocui.ModNone, handleMenuToggle},
+	{ViewData, 'm', gocui.ModNone, handleMenuToggle},
+	{ViewMenu, 'm', gocui.ModNone, handleMenuToggle},
 }
 
 func init() {
@@ -108,4 +111,30 @@ func handleDataSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 
 func handleStatusBar(g *gocui.Gui, v *gocui.View) error {
 	return renderStatusBar()
+}
+
+var viewBeforeMenu string
+
+func handleMenuToggle(g *gocui.Gui, v *gocui.View) error {
+	curView := g.CurrentView().Name()
+	if curView == ViewMenu {
+		g.DeleteView(ViewMenu)
+		setCurrentViewOnTop(g, viewBeforeMenu)
+		return nil
+	}
+
+	x, _ := g.Size()
+	x1, y1 := x/5, 5
+	if v, err := g.SetView(ViewMenu, x1, y1, x-x1, y1+len(shortcuts)+3); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Title = "Menu"
+
+		if _, err = setCurrentViewOnTop(g, ViewMenu); err != nil {
+			return err
+		}
+	}
+	viewBeforeMenu = curView
+	return renderMenu()
 }

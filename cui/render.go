@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/mattn/go-runewidth"
 )
 
 type (
@@ -180,9 +181,57 @@ func renderStatusBar() error {
 		text = "m: menu, r: reload, d: delete"
 	case ViewData:
 		text = "m: menu, c: complete"
+	case ViewMenu:
+		text = "m: quit"
 	}
 	view, _ := g.View(ViewStatus)
 	view.Clear()
 	view.Write([]byte(text))
+	return nil
+}
+
+// shortcuts for menu display
+var shortcuts = [][]string{
+	[]string{"h(←) l(→)", "switch keys/data panel"},
+	[]string{"k(↑) j(↓)", "select keys/data item"},
+	[]string{"enter", "query condition"},
+	[]string{"m", "toggle menu panel"},
+	[]string{"s", "switch database"},
+	[]string{"ctrl+c", "quit"},
+}
+
+func renderMenu() error {
+	var (
+		view, _ = g.View(ViewMenu)
+		x, _    = view.Size()
+		w1, w2  int
+		content string = "\n\n"
+	)
+
+	for _, ss := range shortcuts {
+		if w := runewidth.StringWidth(ss[0]); w > w1 {
+			w1 = w
+		}
+		if w := runewidth.StringWidth(ss[1]); w > w2 {
+			w2 = w
+		}
+	}
+	w := w1 + w2 + 2
+	b := (x - w) / 2
+
+	for _, ss := range shortcuts {
+		s1, s2 := ss[0], ss[1]
+		for i := 0; i < b; i++ {
+			content += " "
+		}
+		content += s1
+		for i := 0; i < w1-len(s1); i++ {
+			content += " "
+		}
+		content += "  " + s2 + "\n"
+	}
+
+	view.Clear()
+	view.Write([]byte(content))
 	return nil
 }

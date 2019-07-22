@@ -15,6 +15,7 @@ const (
 	ViewCond   = "cond"
 	ViewOption = "option"
 	ViewStatus = "status"
+	ViewMenu   = "menu"
 )
 
 var g *gocui.Gui
