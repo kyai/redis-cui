@@ -22,5 +22,5 @@ func (e *List) Widths() []int {
 }
 
 func (e *List) Render(v *gocui.View) {
-	render(v, e.Rows, e.Column(), e.Widths())
+	e.render(v, e.Rows, e.Column(), e.Widths())
 }

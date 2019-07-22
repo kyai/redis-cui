@@ -16,5 +16,5 @@ func (e *String) Widths() []int {
 }
 
 func (e *String) Render(v *gocui.View) {
-	render(v, e.Rows, e.Column(), e.Widths())
+	e.render(v, e.Rows, e.Column(), e.Widths())
 }

@@ -2,6 +2,7 @@ package class
 
 import (
 	"log"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 )
@@ -40,6 +41,9 @@ type Base struct {
 }
 
 func (b *Base) AddRow(s ...string) {
+	for k, v := range s {
+		s[k] = strings.ReplaceAll(v, "\n", "")
+	}
 	b.Rows = append(b.Rows, s)
 }
 
@@ -60,7 +64,7 @@ func (b *Base) Widths(c []string) []int {
 	return w
 }
 
-func render(view *gocui.View, rows [][]string, c []string, w []int) {
+func (b *Base) render(view *gocui.View, rows [][]string, c []string, w []int) {
 	var title string
 	for k, v := range c {
 		if k < len(c)-1 {
