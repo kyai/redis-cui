@@ -129,6 +129,11 @@ func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
 	return g.SetViewOnTop(name)
 }
 
+func getCurrentLine(v *gocui.View) (string, error) {
+	_, y := v.Cursor()
+	return v.Line(y)
+}
+
 func fillAtLeft(s string, l int) string {
 	n := l - len(s)
 	for i := 0; i < n; i++ {

@@ -18,6 +18,9 @@ var keyboard = []struct {
 	{ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine},
 	{ViewData, gocui.KeyArrowUp, gocui.ModNone, handleDataPrevLine},
 	{ViewData, gocui.KeyArrowDown, gocui.ModNone, handleDataNextLine},
+	{ViewKeys, 'r', gocui.ModNone, handleDataReload},
+	{ViewData, 'r', gocui.ModNone, handleDataReload},
+	{ViewKeys, 'd', gocui.ModNone, handleKeysDelete},
 	{ViewKeys, 'm', gocui.ModNone, handleMenuToggle},
 	{ViewData, 'm', gocui.ModNone, handleMenuToggle},
 	{ViewMenu, 'm', gocui.ModNone, handleMenuToggle},
@@ -92,6 +95,11 @@ func handleKeysSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 	return renderData()
 }
 
+// TODO:
+func handleKeysDelete(g *gocui.Gui, v *gocui.View) error {
+	return nil
+}
+
 func handleDataNextLine(g *gocui.Gui, v *gocui.View) error {
 	return handleDataSelect(g, v, false)
 }
@@ -107,6 +115,11 @@ func handleDataSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 		v.MoveCursor(0, 1, false)
 	}
 	return nil
+}
+
+// reload data for selected key
+func handleDataReload(g *gocui.Gui, v *gocui.View) error {
+	return renderData()
 }
 
 func handleStatusBar(g *gocui.Gui, v *gocui.View) error {
