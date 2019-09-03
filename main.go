@@ -4,9 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"redis-cui/app"
-	"redis-cui/cui"
-	"redis-cui/redis"
+
+	"github.com/kyai/redis-cui/app"
+	"github.com/kyai/redis-cui/cui"
+	"github.com/kyai/redis-cui/redis"
 )
 
 func init() {

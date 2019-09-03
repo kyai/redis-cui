@@ -3,9 +3,9 @@ package cui
 import (
 	"fmt"
 	"log"
-	"redis-cui/app"
 
 	"github.com/jroimartin/gocui"
+	"github.com/kyai/redis-cui/app"
 )
 
 const (

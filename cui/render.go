@@ -2,13 +2,13 @@ package cui
 
 import (
 	"fmt"
-	"redis-cui/class"
-	"redis-cui/redis"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/kyai/redis-cui/class"
+	"github.com/kyai/redis-cui/redis"
 	"github.com/mattn/go-runewidth"
 )
 
