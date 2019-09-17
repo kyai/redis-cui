@@ -1,6 +1,11 @@
 package class
 
-import "github.com/jroimartin/gocui"
+import (
+	"encoding/json"
+	"strings"
+
+	"github.com/jroimartin/gocui"
+)
 
 type String struct {
 	Base
@@ -16,5 +21,14 @@ func (e *String) Widths() []int {
 }
 
 func (e *String) Render(v *gocui.View) {
+	// format json
+	if s := e.Rows[0][0]; len(s) > 0 {
+		var j interface{}
+		if err := json.Unmarshal([]byte(s), &j); err == nil {
+			if b, err := json.MarshalIndent(j, "", "  "); err == nil {
+				e.Rows[0][0] = strings.ReplaceAll(string(b), "\n", "\n ")
+			}
+		}
+	}
 	e.render(v, e.Rows, e.Column(), e.Widths())
 }
