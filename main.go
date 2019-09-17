@@ -11,9 +11,9 @@ import (
 )
 
 func init() {
-	flag.StringVar(&app.RedisHost, "h", "127.0.0.1:6379", "redis's host")
-	flag.StringVar(&app.RedisAuth, "p", "", "redis's auth")
-	flag.Parse()
+	flag.StringVar(&app.RedisHost, "h", "127.0.0.1", "redis's host")
+	flag.StringVar(&app.RedisPort, "p", "6379", "redis's port")
+	flag.StringVar(&app.RedisAuth, "a", "", "redis's auth")
 }
 
 func main() {
@@ -26,10 +26,18 @@ func main() {
 		case "--version":
 			fmt.Println(app.VERSION)
 			os.Exit(0)
+		default:
+			flag.Parse()
 		}
 	}
 
-	if err := redis.NewPool(app.RedisHost, app.RedisAuth, 10, 10, 10); err != nil {
+	if err := redis.NewPool(
+		app.RedisHost+":"+app.RedisPort,
+		app.RedisAuth,
+		app.RedisPoolMaxIdle,
+		app.RedisPoolMaxActive,
+		app.RedisPoolIdleTimeout,
+	); err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
