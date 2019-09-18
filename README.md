@@ -5,6 +5,8 @@
 
 A command-line tool for redis
 
+![demo](/docs/demo.gif)
+
 ## Installation
 
 ```go
