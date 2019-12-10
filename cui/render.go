@@ -55,7 +55,7 @@ func renderKeys() (err error) {
 	view.Clear()
 	sort.Strings(keys)
 	for k, v := range keys {
-		fmt.Fprint(view, v)
+		fmt.Fprint(view, " "+v)
 		if k < len(keys)-1 {
 			fmt.Fprintln(view)
 		}
