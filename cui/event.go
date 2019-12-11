@@ -20,7 +20,6 @@ var keyboard = []struct {
 	{ViewData, gocui.KeyArrowDown, gocui.ModNone, handleDataNextLine},
 	{ViewKeys, 'r', gocui.ModNone, handleDataReload},
 	{ViewData, 'r', gocui.ModNone, handleDataReload},
-	{ViewKeys, 'd', gocui.ModNone, handleKeysDelete},
 	{ViewKeys, 'm', gocui.ModNone, handleMenuToggle},
 	{ViewData, 'm', gocui.ModNone, handleMenuToggle},
 	{ViewMenu, 'm', gocui.ModNone, handleMenuToggle},
@@ -93,11 +92,6 @@ func handleKeysSelect(g *gocui.Gui, v *gocui.View, up bool) error {
 		v.MoveCursor(0, 1, false)
 	}
 	return renderData()
-}
-
-// TODO:
-func handleKeysDelete(g *gocui.Gui, v *gocui.View) error {
-	return nil
 }
 
 func handleDataNextLine(g *gocui.Gui, v *gocui.View) error {

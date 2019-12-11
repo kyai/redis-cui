@@ -70,6 +70,7 @@ func renderData() (err error) {
 	vKeys, _ := g.View(ViewKeys)
 	_, cy := vKeys.Cursor()
 	key, _ := vKeys.Line(cy)
+	key = strings.Trim(key, " ")
 
 	vOption, _ := g.View(ViewOption)
 	vData, _ := g.View(ViewData)
@@ -178,9 +179,9 @@ func renderStatusBar() error {
 	var text string
 	switch g.CurrentView().Name() {
 	case ViewKeys:
-		text = "m: menu, r: reload, d: delete"
+		text = "m: menu, r: reload"
 	case ViewData:
-		text = "m: menu, c: complete"
+		text = "m: menu, r: reload, f: format"
 	case ViewMenu:
 		text = "m: quit"
 	}
