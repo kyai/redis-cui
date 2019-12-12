@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/jroimartin/gocui"
+	"github.com/kyai/gocui"
 )
 
 type Class interface {
@@ -68,7 +68,7 @@ func (b *Base) render(view *gocui.View, rows [][]string, c []string, w []int) {
 	var title string
 	for k, v := range c {
 		if k < len(c)-1 {
-			title += fillRight(v, "-", w[k])
+			title += fillRight(v, "─", w[k])
 		} else {
 			title += v
 		}

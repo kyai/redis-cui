@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/jroimartin/gocui"
+	"github.com/kyai/gocui"
 )
 
 type String struct {

@@ -1,7 +1,7 @@
 package cui
 
 import (
-	"github.com/jroimartin/gocui"
+	"github.com/kyai/gocui"
 )
 
 var keyboard = []struct {

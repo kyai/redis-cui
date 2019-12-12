@@ -1,6 +1,6 @@
 package class
 
-import "github.com/jroimartin/gocui"
+import "github.com/kyai/gocui"
 
 type Zset struct {
 	Base

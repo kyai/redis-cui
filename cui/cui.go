@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jroimartin/gocui"
+	"github.com/kyai/gocui"
 	"github.com/kyai/redis-cui/app"
 )
 
