@@ -193,8 +193,8 @@ func renderStatusBar() error {
 		text = "m: menu, r: reload"
 	case ViewData:
 		text = "m: menu, r: reload, f: format"
-	case ViewMenu:
-		text = "m: quit"
+	case ViewMenu, ViewSelect:
+		text = "esc: close"
 	}
 	view, _ := g.View(ViewStatus)
 	view.Clear()
