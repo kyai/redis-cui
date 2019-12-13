@@ -6,6 +6,7 @@ import (
 
 	"github.com/kyai/gocui"
 	"github.com/kyai/redis-cui/app"
+	"github.com/kyai/redis-cui/ext"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 	ViewCond   = "cond"
 	ViewOption = "option"
 	ViewStatus = "status"
+	ViewSelect = "select"
 	ViewMenu   = "menu"
 )
 
@@ -28,17 +30,23 @@ func New() {
 	}
 	defer g.Close()
 
+	ext.Init(g)
+
 	g.Highlight = true
 	g.Cursor = true
+	g.InputEsc = true
 	g.SelFgColor = gocui.ColorGreen
 
 	g.SetManagerFunc(layout)
 
 	g.Update(func(*gocui.Gui) error {
-		if err := renderStatusBar(); err != nil {
+		if err := renderInfo(); err != nil {
 			return err
 		}
-		return renderKeys()
+		if err := renderKeys(); err != nil {
+			return err
+		}
+		return renderStatusBar()
 	})
 
 	if err = keybind(); err != nil {
@@ -60,7 +68,6 @@ func layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Title = "Info"
-		v.Write([]byte(fmt.Sprintf("%s (db%d)", app.RedisHost, app.RedisDB)))
 	}
 
 	if v, err := g.SetView(ViewKeys, 0, 3, leftX, y-2); err != nil {

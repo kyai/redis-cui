@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/kyai/redis-cui/app"
 	"github.com/kyai/redis-cui/class"
 	"github.com/kyai/redis-cui/redis"
 	"github.com/mattn/go-runewidth"
@@ -31,6 +32,16 @@ type (
 		Score int
 	}
 )
+
+func renderInfo() (err error) {
+	view, err := g.View(ViewInfo)
+	if err != nil {
+		return
+	}
+	view.Clear()
+	_, err = view.Write([]byte(fmt.Sprintf("%s (db%d)", app.RedisHost, app.RedisDB)))
+	return
+}
 
 func renderKeys() (err error) {
 	view, err := g.View(ViewCond)
@@ -188,6 +199,32 @@ func renderStatusBar() error {
 	view, _ := g.View(ViewStatus)
 	view.Clear()
 	view.Write([]byte(text))
+	return nil
+}
+
+// render db select panel
+func renderSelect() error {
+	view, err := g.View(ViewSelect)
+	if err != nil {
+		return err
+	}
+
+	conn := redis.Pool.Get()
+	defer conn.Close()
+
+	res, err := redis.Strings(conn.Do("config", "get", "databases"))
+	if err != nil {
+		return err
+	}
+	dbs := 16
+	if res[0] == "databases" {
+		dbs, _ = strconv.Atoi(res[1])
+	}
+
+	view.Title = fmt.Sprintf("Index (0~%d)", dbs-1)
+	view.Frame = true
+	view.Editable = true
+	view.Write([]byte(strconv.Itoa(app.RedisDB)))
 	return nil
 }
 

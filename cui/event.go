@@ -1,7 +1,12 @@
 package cui
 
 import (
+	"strconv"
+
 	"github.com/kyai/gocui"
+	"github.com/kyai/redis-cui/app"
+	"github.com/kyai/redis-cui/ext"
+	"github.com/kyai/redis-cui/redis"
 )
 
 var keyboard = []struct {
@@ -13,16 +18,22 @@ var keyboard = []struct {
 	{"", gocui.KeyCtrlC, gocui.ModNone, quit},
 	{ViewData, gocui.KeyArrowLeft, gocui.ModNone, switchKeys},
 	{ViewKeys, gocui.KeyArrowRight, gocui.ModNone, switchData},
-	{"", gocui.KeyEnter, gocui.ModNone, switchCond},
+	{ViewKeys, gocui.KeyEnter, gocui.ModNone, switchCond},
+	{ViewData, gocui.KeyEnter, gocui.ModNone, switchCond},
+	{ViewCond, gocui.KeyEnter, gocui.ModNone, switchCond},
 	{ViewKeys, gocui.KeyArrowUp, gocui.ModNone, handleKeysPrevLine},
 	{ViewKeys, gocui.KeyArrowDown, gocui.ModNone, handleKeysNextLine},
 	{ViewData, gocui.KeyArrowUp, gocui.ModNone, handleDataPrevLine},
 	{ViewData, gocui.KeyArrowDown, gocui.ModNone, handleDataNextLine},
+	{ViewKeys, 's', gocui.ModNone, handleDbSelect},
+	{ViewData, 's', gocui.ModNone, handleDbSelect},
 	{ViewKeys, 'r', gocui.ModNone, handleDataReload},
 	{ViewData, 'r', gocui.ModNone, handleDataReload},
 	{ViewKeys, 'm', gocui.ModNone, handleMenuToggle},
 	{ViewData, 'm', gocui.ModNone, handleMenuToggle},
-	{ViewMenu, 'm', gocui.ModNone, handleMenuToggle},
+	{ViewMenu, gocui.KeyEsc, gocui.ModNone, handleClose},
+	{ViewSelect, gocui.KeyEnter, gocui.ModNone, handleDbSelectDo},
+	{ViewSelect, gocui.KeyEsc, gocui.ModNone, handleClose},
 }
 
 func init() {
@@ -120,28 +131,53 @@ func handleStatusBar(g *gocui.Gui, v *gocui.View) error {
 	return renderStatusBar()
 }
 
-var viewBeforeMenu string
+func handleDbSelect(g *gocui.Gui, v *gocui.View) error {
+	_, err := ext.OpenOnCenter(ViewSelect, 20, 3)
+	if err != nil {
+		return err
+	}
+
+	return renderSelect()
+}
+
+func handleDbSelectDo(g *gocui.Gui, v *gocui.View) error {
+	val := v.ViewBufferLines()[0]
+	db, err := strconv.Atoi(val)
+	if err != nil {
+		return nil // do not switch
+	}
+
+	err = ext.Close(v.Name())
+	if err != nil {
+		return err
+	}
+
+	conn := redis.Pool.Get()
+	defer conn.Close()
+
+	_, err = conn.Do("SELECT", db)
+	if err != nil {
+		return err
+	}
+	app.RedisDB = db
+
+	if err = renderInfo(); err != nil {
+		return err
+	}
+
+	return renderKeys()
+}
 
 func handleMenuToggle(g *gocui.Gui, v *gocui.View) error {
-	curView := g.CurrentView().Name()
-	if curView == ViewMenu {
-		g.DeleteView(ViewMenu)
-		setCurrentViewOnTop(g, viewBeforeMenu)
-		return nil
+	view, err := ext.OpenOnCenter(ViewMenu, 60, len(shortcuts)+4)
+	if err != nil {
+		return err
 	}
+	view.Title = "Menu"
 
-	x, _ := g.Size()
-	x1, y1 := x/5, 5
-	if v, err := g.SetView(ViewMenu, x1, y1, x-x1, y1+len(shortcuts)+3); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Menu"
-
-		if _, err = setCurrentViewOnTop(g, ViewMenu); err != nil {
-			return err
-		}
-	}
-	viewBeforeMenu = curView
 	return renderMenu()
+}
+
+func handleClose(g *gocui.Gui, v *gocui.View) error {
+	return ext.Close(v.Name())
 }
