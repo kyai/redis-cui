@@ -4,9 +4,7 @@ import (
 	"strconv"
 
 	"github.com/kyai/gocui"
-	"github.com/kyai/redis-cui/app"
 	"github.com/kyai/redis-cui/ext"
-	"github.com/kyai/redis-cui/redis"
 )
 
 var keyboard = []struct {
@@ -152,14 +150,10 @@ func handleDbSelectDo(g *gocui.Gui, v *gocui.View) error {
 		return err
 	}
 
-	conn := redis.Pool.Get()
-	defer conn.Close()
-
-	_, err = conn.Do("SELECT", db)
-	if err != nil {
+	// FIXME: seem not work
+	if err = client.Conn().Select(db).Err(); err != nil {
 		return err
 	}
-	app.RedisDB = db
 
 	if err = renderInfo(); err != nil {
 		return err

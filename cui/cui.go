@@ -5,9 +5,10 @@ import (
 	"log"
 
 	"github.com/kyai/gocui"
-	"github.com/kyai/redis-cui/app"
 	"github.com/kyai/redis-cui/ext"
 )
+
+const VERSION = "v0.1.0"
 
 const (
 	ViewInfo   = "info"
@@ -119,7 +120,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Frame = false
 		v.FgColor = gocui.ColorCyan
-		fmt.Fprintln(v, fillAtLeft(app.VERSION, 9))
+		fmt.Fprintln(v, fillAtLeft(VERSION, 9))
 	}
 
 	return nil

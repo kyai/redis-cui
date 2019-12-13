@@ -5,15 +5,20 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kyai/redis-cui/app"
+	"github.com/go-redis/redis/v7"
 	"github.com/kyai/redis-cui/cui"
-	"github.com/kyai/redis-cui/redis"
+)
+
+var (
+	redisHost string
+	redisPort string
+	redisAuth string
 )
 
 func init() {
-	flag.StringVar(&app.RedisHost, "h", "127.0.0.1", "redis's host")
-	flag.StringVar(&app.RedisPort, "p", "6379", "redis's port")
-	flag.StringVar(&app.RedisAuth, "a", "", "redis's auth")
+	flag.StringVar(&redisHost, "h", "127.0.0.1", "Server hostname")
+	flag.StringVar(&redisPort, "p", "6379", "Server port")
+	flag.StringVar(&redisAuth, "a", "", "Password to use when connecting to the server")
 }
 
 func main() {
@@ -24,23 +29,23 @@ func main() {
 			flag.Usage()
 			os.Exit(0)
 		case "--version":
-			fmt.Println(app.VERSION)
+			fmt.Println(cui.VERSION)
 			os.Exit(0)
 		default:
 			flag.Parse()
 		}
 	}
 
-	if err := redis.NewPool(
-		app.RedisHost+":"+app.RedisPort,
-		app.RedisAuth,
-		app.RedisPoolMaxIdle,
-		app.RedisPoolMaxActive,
-		app.RedisPoolIdleTimeout,
-	); err != nil {
+	client := redis.NewClient(&redis.Options{
+		Addr:     redisHost + ":" + redisPort,
+		Password: redisAuth,
+		DB:       0,
+	})
+	if err := client.Ping().Err(); err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
+	cui.InitRedisClient(client)
 
 	cui.New()
 }

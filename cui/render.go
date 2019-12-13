@@ -7,31 +7,18 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/kyai/redis-cui/app"
+	"github.com/go-redis/redis/v7"
 	"github.com/kyai/redis-cui/class"
-	"github.com/kyai/redis-cui/redis"
 	"github.com/mattn/go-runewidth"
 )
 
-type (
-	Entry struct {
-		Key  string
-		TTL  int
-		Type string
-		Size int
-		Data interface{}
-	}
-
-	Hash struct {
-		Key   string
-		Value string
-	}
-
-	Zset struct {
-		Value string
-		Score int
-	}
-)
+type Entry struct {
+	Key  string
+	TTL  float64
+	Type string
+	Size int
+	Data interface{}
+}
 
 func renderInfo() (err error) {
 	view, err := g.View(ViewInfo)
@@ -39,7 +26,8 @@ func renderInfo() (err error) {
 		return
 	}
 	view.Clear()
-	_, err = view.Write([]byte(fmt.Sprintf("%s (db%d)", app.RedisHost, app.RedisDB)))
+	opt := client.Options()
+	_, err = view.Write([]byte(fmt.Sprintf("%s[%d]", opt.Addr, opt.DB)))
 	return
 }
 
@@ -50,10 +38,7 @@ func renderKeys() (err error) {
 	}
 	cond := view.ViewBufferLines()[0]
 
-	conn := redis.Pool.Get()
-	defer conn.Close()
-
-	keys, err := redis.Strings(conn.Do("KEYS", cond))
+	keys, err := client.Keys(cond).Result()
 	if err != nil {
 		return
 	}
@@ -119,12 +104,12 @@ func renderData() (err error) {
 			e.AddRow(strconv.Itoa(k+1), v)
 		}
 	case "HASH":
-		for k, v := range entry.Data.([]*Hash) {
-			e.AddRow(strconv.Itoa(k+1), v.Key, v.Value)
+		for k, v := range entry.Data.(map[string]string) {
+			e.AddRow(k, v)
 		}
 	case "ZSET":
-		for k, v := range entry.Data.([]*Zset) {
-			e.AddRow(strconv.Itoa(k+1), v.Value, strconv.Itoa(v.Score))
+		for _, v := range entry.Data.([]redis.Z) {
+			e.AddRow(v.Member.(string), fmt.Sprint(v.Score))
 		}
 	}
 
@@ -134,47 +119,34 @@ func renderData() (err error) {
 }
 
 func getRedisEntry(key string) (entry *Entry, err error) {
-	conn := redis.Pool.Get()
-	defer conn.Close()
-
-	exist, err := redis.Bool(conn.Do("EXISTS", key))
-	if err != nil || !exist {
+	if client.Exists(key).Val() == 0 {
 		return
 	}
 
 	entry = &Entry{}
 	entry.Key = key
-	entry.TTL, _ = redis.Int(conn.Do("TTL", key))
-	entry.Type, _ = redis.String(conn.Do("TYPE", key))
+	entry.TTL = client.TTL(key).Val().Seconds()
+	if entry.TTL < 0 {
+		entry.TTL = -1
+	}
+	entry.Type = client.Type(key).Val()
 	entry.Type = strings.ToUpper(entry.Type)
 
 	switch entry.Type {
 	case "STRING":
-		entry.Data, _ = redis.String(conn.Do("GET", key))
+		entry.Data = client.Get(key).Val()
 	case "LIST":
-		entry.Data, _ = redis.Strings(conn.Do("LRANGE", key, 0, -1))
+		entry.Data = client.LRange(key, 0, -1).Val()
 		entry.Size = len(entry.Data.([]string))
 	case "HASH":
-		data, _ := redis.StringMap(conn.Do("HGETALL", key))
-		keys := MapKeys(data)
-		hashs := make([]*Hash, len(keys))
-		for k, v := range keys {
-			hashs[k] = &Hash{v, data[v]}
-		}
-		entry.Data = hashs
-		entry.Size = len(hashs)
+		entry.Data = client.HGetAll(key).Val()
+		entry.Size = len(entry.Data.(map[string]string))
 	case "SET":
-		entry.Data, _ = redis.Strings(conn.Do("SMEMBERS", key))
+		entry.Data = client.SMembers(key).Val()
 		entry.Size = len(entry.Data.([]string))
 	case "ZSET":
-		data, _ := redis.Strings(conn.Do("ZRANGE", key, 0, -1, "WITHSCORES"))
-		zsets := make([]*Zset, len(data)/2)
-		for i := 0; i < len(data); i += 2 {
-			score, _ := strconv.Atoi(data[i+1])
-			zsets[i/2] = &Zset{data[i], score}
-		}
-		entry.Data = zsets
-		entry.Size = len(zsets)
+		entry.Data = client.ZRangeWithScores(key, 0, -1).Val()
+		entry.Size = len(entry.Data.([]redis.Z))
 	}
 
 	return
@@ -209,22 +181,15 @@ func renderSelect() error {
 		return err
 	}
 
-	conn := redis.Pool.Get()
-	defer conn.Close()
-
-	res, err := redis.Strings(conn.Do("config", "get", "databases"))
+	dbs, err := getDatabases()
 	if err != nil {
 		return err
-	}
-	dbs := 16
-	if res[0] == "databases" {
-		dbs, _ = strconv.Atoi(res[1])
 	}
 
 	view.Title = fmt.Sprintf("Index (0~%d)", dbs-1)
 	view.Frame = true
 	view.Editable = true
-	view.Write([]byte(strconv.Itoa(app.RedisDB)))
+	view.Write([]byte(strconv.Itoa(client.Options().DB)))
 	return nil
 }
 
