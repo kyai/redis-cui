@@ -22,5 +22,6 @@ func (e *Zset) Widths() []int {
 }
 
 func (e *Zset) Render(v *gocui.View) {
+	e.rownum()
 	e.render(v, e.Rows, e.Column(), e.Widths())
 }

@@ -106,8 +106,8 @@ func renderData() (err error) {
 	case "STRING":
 		e.AddRow(entry.Data.(string))
 	case "LIST", "SET":
-		for k, v := range entry.Data.([]string) {
-			e.AddRow(strconv.Itoa(k+1), v)
+		for _, v := range entry.Data.([]string) {
+			e.AddRow(v)
 		}
 	case "HASH":
 		for k, v := range entry.Data.(map[string]string) {

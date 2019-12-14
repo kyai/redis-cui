@@ -2,6 +2,7 @@ package class
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/kyai/gocui"
@@ -62,6 +63,12 @@ func (b *Base) Widths(c []string) []int {
 		}
 	}
 	return w
+}
+
+func (b *Base) rownum() {
+	for i, row := range b.Rows {
+		b.Rows[i] = append([]string{strconv.Itoa(i + 1)}, row...)
+	}
 }
 
 func (b *Base) render(view *gocui.View, rows [][]string, c []string, w []int) {

@@ -22,5 +22,6 @@ func (e *Hash) Widths() []int {
 }
 
 func (e *Hash) Render(v *gocui.View) {
+	e.rownum()
 	e.render(v, e.Rows, e.Column(), e.Widths())
 }
