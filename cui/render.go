@@ -71,6 +71,12 @@ func renderData() (err error) {
 	vOption, _ := g.View(ViewOption)
 	vData, _ := g.View(ViewData)
 
+	if len(key) == 0 {
+		vOption.Clear()
+		vData.Clear()
+		return nil
+	}
+
 	entry, _ := getRedisEntry(key)
 	if entry == nil {
 		return

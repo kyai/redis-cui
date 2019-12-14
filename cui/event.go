@@ -150,10 +150,7 @@ func handleDbSelectDo(g *gocui.Gui, v *gocui.View) error {
 		return err
 	}
 
-	// FIXME: seem not work
-	if err = client.Conn().Select(db).Err(); err != nil {
-		return err
-	}
+	selectDatabase(db)
 
 	if err = renderInfo(); err != nil {
 		return err

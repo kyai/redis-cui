@@ -27,3 +27,9 @@ func getDatabases() (dbs int, err error) {
 	}
 	return
 }
+
+func selectDatabase(n int) {
+	opt := client.Options()
+	opt.DB = n
+	client = redis.NewClient(opt)
+}
