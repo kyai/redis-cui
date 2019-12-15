@@ -1,14 +1,13 @@
 package cui
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/kyai/gocui"
-	"github.com/kyai/redis-cui/ext"
+	"github.com/kyai/redis-cui/common"
 )
 
-const VERSION = "v0.1.0"
+const VERSION = "v0.2.0"
 
 const (
 	ViewInfo   = "info"
@@ -21,7 +20,15 @@ const (
 	ViewMenu   = "menu"
 )
 
-var g *gocui.Gui
+var (
+	g *gocui.Gui
+
+	// Extended gui
+	ext *common.Extend
+
+	// The default redis query condition
+	Query string
+)
 
 func New() {
 	var err error
@@ -31,7 +38,7 @@ func New() {
 	}
 	defer g.Close()
 
-	ext.Init(g)
+	ext = common.NewExtend(g)
 
 	g.Highlight = true
 	g.Cursor = true
@@ -68,7 +75,7 @@ func layout(g *gocui.Gui) error {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
-		v.Title = "Info"
+		v.Title = "Server"
 	}
 
 	if v, err := g.SetView(ViewKeys, 0, 3, leftX, y-2); err != nil {
@@ -78,7 +85,7 @@ func layout(g *gocui.Gui) error {
 		v.Title = "Keys"
 		v.Highlight = true
 
-		if _, err = setCurrentViewOnTop(g, ViewKeys); err != nil {
+		if _, err = ext.SetCurrentViewOnTop(ViewKeys); err != nil {
 			return err
 		}
 	}
@@ -103,7 +110,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Frame = false
 		v.Editable = true
-		fmt.Fprintln(v, "*")
+		v.WriteString(Query)
 	}
 
 	if v, err := g.SetView(ViewStatus, leftX+1, y-2, x, y); err != nil {
@@ -120,7 +127,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Frame = false
 		v.FgColor = gocui.ColorCyan
-		fmt.Fprintln(v, fillAtLeft(VERSION, 9))
+		v.WriteString(common.FillLeft(VERSION, ' ', 9))
 	}
 
 	return nil
@@ -128,24 +135,4 @@ func layout(g *gocui.Gui) error {
 
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
-}
-
-func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
-	if _, err := g.SetCurrentView(name); err != nil {
-		return nil, err
-	}
-	return g.SetViewOnTop(name)
-}
-
-func getCurrentLine(v *gocui.View) (string, error) {
-	_, y := v.Cursor()
-	return v.Line(y)
-}
-
-func fillAtLeft(s string, l int) string {
-	n := l - len(s)
-	for i := 0; i < n; i++ {
-		s = " " + s
-	}
-	return s
 }

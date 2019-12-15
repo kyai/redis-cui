@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/kyai/gocui"
+	"github.com/kyai/redis-cui/common"
 )
 
 type Class interface {
@@ -75,7 +76,7 @@ func (b *Base) render(view *gocui.View, rows [][]string, c []string, w []int) {
 	var title string
 	for k, v := range c {
 		if k < len(c)-1 {
-			title += fillRight(v, "─", w[k])
+			title += common.FillRight(v, '─', w[k])
 		} else {
 			title += v
 		}
@@ -86,18 +87,11 @@ func (b *Base) render(view *gocui.View, rows [][]string, c []string, w []int) {
 	for i, row := range rows {
 		line := " "
 		for k, v := range row {
-			line += fillRight(v, " ", w[k])
+			line += common.FillRight(v, ' ', w[k])
 		}
 		view.Write([]byte(line))
 		if i < len(rows)-1 {
 			view.Write([]byte("\n"))
 		}
 	}
-}
-
-func fillRight(s, f string, l int) string {
-	for i, j := 0, l-len(s); i < j; i++ {
-		s += f
-	}
-	return s
 }

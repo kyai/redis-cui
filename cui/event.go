@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/kyai/gocui"
-	"github.com/kyai/redis-cui/ext"
 )
 
 var keyboard = []struct {
@@ -67,12 +66,12 @@ func keybind() (err error) {
 }
 
 func switchKeys(g *gocui.Gui, v *gocui.View) error {
-	_, err := setCurrentViewOnTop(g, ViewKeys)
+	_, err := ext.SetCurrentViewOnTop(ViewKeys)
 	return err
 }
 
 func switchData(g *gocui.Gui, v *gocui.View) error {
-	_, err := setCurrentViewOnTop(g, ViewData)
+	_, err := ext.SetCurrentViewOnTop(ViewData)
 	return err
 }
 
@@ -82,7 +81,7 @@ func switchCond(g *gocui.Gui, v *gocui.View) error {
 		name = ViewKeys
 		renderKeys()
 	}
-	_, err := setCurrentViewOnTop(g, name)
+	_, err := ext.SetCurrentViewOnTop(name)
 	return err
 }
 
