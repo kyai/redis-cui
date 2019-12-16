@@ -9,7 +9,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/go-redis/redis/v7"
 	"github.com/kyai/redis-cui/class"
-	"github.com/mattn/go-runewidth"
+	"github.com/kyai/redis-cui/common"
 )
 
 type Entry struct {
@@ -200,13 +200,16 @@ func renderSelect() error {
 }
 
 // shortcuts for menu display
-var shortcuts = [][]string{
-	[]string{"h(←) l(→)", "switch keys/data panel"},
-	[]string{"k(↑) j(↓)", "select keys/data item"},
-	[]string{"enter", "query condition"},
-	[]string{"m", "toggle menu panel"},
-	[]string{"s", "switch database"},
-	[]string{"ctrl+c", "quit"},
+var shortcuts = []struct {
+	Key string
+	Des string
+}{
+	{"h(←) l(→)", "Switch keys/data panel"},
+	{"k(↑) j(↓)", "Select keys/data item"},
+	{"enter", "Query condition"},
+	{"s", "Select database"},
+	{"m", "Display menu"},
+	{"ctrl+c", "Quit"},
 }
 
 func renderMenu() error {
@@ -215,29 +218,24 @@ func renderMenu() error {
 		x, _    = view.Size()
 		w1, w2  int
 		content string = "\n\n"
+		cnum           = common.Characters
 	)
 
-	for _, ss := range shortcuts {
-		if w := runewidth.StringWidth(ss[0]); w > w1 {
+	for _, s := range shortcuts {
+		if w := cnum(s.Key); w > w1 {
 			w1 = w
 		}
-		if w := runewidth.StringWidth(ss[1]); w > w2 {
+		if w := cnum(s.Des); w > w2 {
 			w2 = w
 		}
 	}
 	w := w1 + w2 + 2
 	b := (x - w) / 2
 
-	for _, ss := range shortcuts {
-		s1, s2 := ss[0], ss[1]
-		for i := 0; i < b; i++ {
-			content += " "
-		}
-		content += s1
-		for i := 0; i < w1-len(s1); i++ {
-			content += " "
-		}
-		content += "  " + s2 + "\n"
+	for _, s := range shortcuts {
+		content += common.FillLeft(s.Key, ' ', b+cnum(s.Key))
+		content += common.FillLeft(s.Des, ' ', w1-cnum(s.Key)+cnum(s.Des)+2)
+		content += "\n"
 	}
 
 	view.Clear()
