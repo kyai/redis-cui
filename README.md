@@ -31,6 +31,18 @@ Or download the binary and add it to your `PATH`
 $ redis-cui
 ```
 
+```
+Usage: redis-cui [OPTIONS]
+
+  -h <hostname>   Server hostname (default: 127.0.0.1)
+  -p <port>       Server port (default: 6379)
+  -a <password>   Password to use when connecting to the server
+  -n <database>   Database number
+  -q              Default redis query condition (default: *)
+  --help          Output this help and exit
+  --version       Output version and exit
+```
+
 ## LICENSE
 
 [MIT](https://github.com/kyai/redis-cui/blob/master/LICENSE)
