@@ -4,10 +4,9 @@ import (
 	"log"
 
 	"github.com/kyai/gocui"
+	"github.com/kyai/redis-cui/cmd"
 	"github.com/kyai/redis-cui/common"
 )
-
-const VERSION = "v0.2.0"
 
 const (
 	ViewInfo   = "info"
@@ -25,9 +24,6 @@ var (
 
 	// Extended gui
 	ext *common.Extend
-
-	// The default redis query condition
-	Query string
 )
 
 func New() {
@@ -110,7 +106,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Frame = false
 		v.Editable = true
-		v.WriteString(Query)
+		v.WriteString(cmd.RedisQuery)
 	}
 
 	if v, err := g.SetView(ViewStatus, leftX+1, y-2, x, y); err != nil {
@@ -127,7 +123,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Frame = false
 		v.FgColor = gocui.ColorCyan
-		v.WriteString(common.FillLeft(VERSION, ' ', 9))
+		v.WriteString(common.FillLeft(common.VERSION, ' ', 9))
 	}
 
 	return nil
