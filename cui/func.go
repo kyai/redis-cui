@@ -1,6 +1,7 @@
 package cui
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
 )
@@ -19,4 +20,17 @@ func StringRaw(s string) string {
 
 func StringLen(s string) int {
 	return len(StringRaw(s))
+}
+
+func StreamFmt(values map[string]interface{}) string {
+	var keys []string
+	for k, _ := range values {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	s := ""
+	for _, key := range keys {
+		s += fmt.Sprintf("%s:%s ", key, values[key])
+	}
+	return s
 }

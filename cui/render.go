@@ -117,6 +117,10 @@ func renderData() (err error) {
 		for _, v := range entry.Data.([]redis.Z) {
 			e.AddRow(v.Member.(string), fmt.Sprint(v.Score))
 		}
+	case "STREAM":
+		for _, v := range entry.Data.([]redis.XMessage) {
+			e.AddRow(v.ID, StreamFmt(v.Values))
+		}
 	}
 
 	e.Render(vData)
@@ -153,6 +157,9 @@ func getRedisEntry(key string) (entry *Entry, err error) {
 	case "ZSET":
 		entry.Data = client.ZRangeWithScores(key, 0, -1).Val()
 		entry.Size = len(entry.Data.([]redis.Z))
+	case "STREAM":
+		entry.Data = client.XRange(key, "-", "+").Val()
+		entry.Size = len(entry.Data.([]redis.XMessage))
 	}
 
 	return

@@ -30,6 +30,8 @@ func NewClass(t string, g *gocui.Gui) Class {
 		return &Hash{base}
 	case "ZSET":
 		return &Zset{base}
+	case "STREAM":
+		return &Stream{base}
 	default:
 		log.Panic("Unknown type: ", t)
 		return nil
